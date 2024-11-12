@@ -26,11 +26,12 @@ jobs:
           CURRENT_APP_JSON_VERSION=$(jq -r '.expo.version' app.json)
           MAJOR_MINOR=${CURRENT_APP_JSON_VERSION%.*}
           echo "Current App version: ${CURRENT_APP_JSON_VERSION}"
+          echo "Current Major-Minor version: ${MAJOR_MINOR}"
           
 
           # get all the patch releases for this major-minor release
           RELEASES_JSON_FILE="app.json"
-          PATCHES_KEY=".releases.\"release-${RELEASE}\""
+          PATCHES_KEY=".releases.\"release-${MAJOR_MINOR}\""
           PATCHES_VAL=$( jq -r "${PATCHES_KEY}[]" "${RELEASES_JSON_FILE}" 2>/dev/null)
 
           if [[ -z "$PATCHES_VAL" ]]; then
