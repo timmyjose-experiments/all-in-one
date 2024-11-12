@@ -19,9 +19,6 @@ jobs:
           cache: yarn
           cache-dependency-path: '**/yarn.lock'
 
-      - name: Install dependencies
-        run: yarn install
-
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
@@ -63,21 +60,7 @@ jobs:
 
             # perform eas update
             echo "Performing eas update for version: ${PATCH_RELEASE}"
-            NODE_OPTIONS="--max-old-space-size=8192" eas update --channel=production --message="$(git log -1 --pretty=%B)"
 
             # upload the source maps
             echo "Uploading sourcemap for version: ${PATCH_RELEASE}"
           done
-
-      - name: (Default - no release version specified) eas update flow
-        if: ${{ !github.event.inputs.version}}
-        run: |
-          # display app version before update
-          EAS_UPDATE_APP_JSON_VERSION=$(jq -r '.expo.version' app.json)
-          echo "app.json version before eas update is = ${EAS_UPDATE_APP_JSON_VERSION}"
-
-          echo "Performing eas update"
-          NODE_OPTIONS="--max-old-space-size=8192" eas update --channel=production --message="$(git log -1 --pretty=%B)"
-
-          echo "Uploading sourcemaps for Sentry"
-
