@@ -14,6 +14,11 @@ const Home = () => {
         onPress={() => navigation.navigate('NetworkInfoDemo')}>
         <Text>Network Info Demo</Text>
       </Pressable>
+      <Pressable
+        style={styles.button}
+        onPress={() => navigation.navigate('LocationDemo')}>
+        <Text>Location Demo</Text>
+      </Pressable>
     </View>
   )
 }

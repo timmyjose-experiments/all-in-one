@@ -1,0 +1,83 @@
+name: EAS / Release / Expo Update
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release (Major-Minor) Version number (for app.json). Eg: 1.2'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Checkout and EAS Update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+          cache-dependency-path: '**/yarn.lock'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: (Major-Minor Release supplied) eas update flow
+        if: ${{ github.event.inputs.version }}
+        run: |
+          # Ensure that the major.minor version is the same
+          CURRENT_APP_JSON_VERSION=$(jq -r '.expo.version' app.json)
+          MAJOR_MINOR=${CURRENT_APP_JSON_VERSION%.*}
+          RELEASE="${{ github.event.inputs.version }}"
+          echo "Current App version: ${CURRENT_APP_JSON_VERSION}; You entered: ${RELEASE}"
+          
+          if [[ "${RELEASE}" != "${MAJOR_MINOR}" ]]; then
+            echo "Invalid supplied app release version: ${RELEASE}. Expected: ${MAJOR_MINOR}."
+            exit 1
+          fi
+
+          # get all the patch releases for this major-minor release
+          RELEASES_JSON_FILE="app.json"
+          PATCHES_KEY=".releases.\"release-${RELEASE}\""
+          PATCHES_VAL=$( jq -r "${PATCHES_KEY}[]" "${RELEASES_JSON_FILE}" 2>/dev/null)
+
+          if [[ -z "$PATCHES_VAL" ]]; then
+            echo "No patch releases found for release: ${RELEASE}"
+            exit 1
+          fi
+
+          for PATCH_RELEASE in ${PATCHES_VAL}; do
+            # update app.json
+            jq --arg version "${PATCH_RELEASE}" '.expo.version = $version' app.json > app.temp.json
+            mv app.temp.json app.json
+
+            # display app.json version
+            EAS_UPDATE_APP_JSON_VERSION=$(jq -r '.expo.version' app.json)
+            echo "app.json version before eas update is = ${EAS_UPDATE_APP_JSON_VERSION}"
+
+            # perform eas update
+            echo "Performing eas update for version: ${PATCH_RELEASE}"
+            NODE_OPTIONS="--max-old-space-size=8192" eas update --channel=production --message="$(git log -1 --pretty=%B)"
+
+            # upload the source maps
+            echo "Uploading sourcemap for version: ${PATCH_RELEASE}"
+          done
+
+      - name: (Default - no release version specified) eas update flow
+        if: ${{ !github.event.inputs.version}}
+        run: |
+          # display app version before update
+          EAS_UPDATE_APP_JSON_VERSION=$(jq -r '.expo.version' app.json)
+          echo "app.json version before eas update is = ${EAS_UPDATE_APP_JSON_VERSION}"
+
+          echo "Performing eas update"
+          NODE_OPTIONS="--max-old-space-size=8192" eas update --channel=production --message="$(git log -1 --pretty=%B)"
+
+          echo "Uploading sourcemaps for Sentry"
+
