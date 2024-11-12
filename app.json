@@ -32,7 +32,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow ${PRODUCT_NAME} to access your location"
         }
-      ]
+      ],
+      "expo-localization"
     ]
   },
   "releases": {
