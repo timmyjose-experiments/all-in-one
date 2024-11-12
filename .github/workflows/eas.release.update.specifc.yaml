@@ -1,0 +1,63 @@
+name: EAS / Release / Expo Update / Specific
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Exact release (Major-Minor-Patch) Version number (for app.json). Eg: 1.2.237'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Checkout and EAS Update
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+          cache-dependency-path: '**/yarn.lock'
+
+      - name: Validate release version format
+        run: |
+          RELEASE="${{ github.event.inputs.version }}"
+
+          if [[ ! "${RELEASE}" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            echo "RELEASE version must be specified in Major.Minor.Patch format"
+            exit 1
+          fi
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: (Major-Minor-Patch Release supplied) eas update flow
+        run: |
+          # Ensure that the major.minor version is the same
+          # in app.json as that supplied in input
+          CURRENT_APP_JSON_VERSION=$(jq -r '.expo.version' app.json)
+          MAJOR_MINOR=${CURRENT_APP_JSON_VERSION%.*}
+          RELEASE="${{ github.event.inputs.version }}"
+          echo "Current App version: ${CURRENT_APP_JSON_VERSION}; You entered: ${RELEASE}"
+          
+          if [[ ! "${RELEASE}" =~ ^${MAJOR_MINOR} ]]; then
+            echo "Invalid supplied app release version: ${RELEASE}. Expected: ${MAJOR_MINOR}.PATCH."
+            exit 1
+          fi
+
+          # update app.json to RELEASE
+          jq --arg version "${RELEASE}" '.expo.version = $version' app.json > app.temp.json
+          mv app.temp.json app.json
+
+          # display app.json version
+          EAS_UPDATE_APP_JSON_VERSION=$(jq -r '.expo.version' app.json)
+          echo "app.json version before eas update is = ${EAS_UPDATE_APP_JSON_VERSION}"
+
+          # perform eas update
+          echo "Performing eas update for version: ${RELEASE}"
+
+          # upload the source maps
+          echo "Uploading sourcemap for version: ${RELEASE}"
