@@ -123,7 +123,11 @@ const AsyncStorageMultiSetGetDemo = () => {
       //   await AsyncStorage.removeItem(key)
       //   console.log(`Finished purging event: ${key}`)
       // }))
-      await AsyncStorage.removeItem(KEY)
+      const entriesCount = parseInt(await AsyncStorage.getItem(`${KEY}-count`) ?? '0')
+      for (let i = 0; i < entriesCount; i++) {
+        await AsyncStorage.removeItem(`${KEY}-${i}`)
+      }
+      await AsyncStorage.setItem(`${KEY}-count`, '0')
       console.log('Finished purging all events')
     } catch (err: any) {
       console.error(`Error while purging events: ${err}`)
