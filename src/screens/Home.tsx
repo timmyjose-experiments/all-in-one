@@ -11,6 +11,11 @@ const Home = () => {
     <View style={styles.container}>
       <Pressable
         style={styles.button}
+        onPress={() => navigation.navigate('AsyncStorageMultiSetGetDemo')}>
+        <Text>AsyncStorage Multi Set/Get Demo</Text>
+      </Pressable>
+      <Pressable
+        style={styles.button}
         onPress={() => navigation.navigate('NetworkInfoDemo')}>
         <Text>Network Info Demo</Text>
       </Pressable>

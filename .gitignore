@@ -6,6 +6,7 @@ package-lock.json
 android
 ios
 .vim
+large-file.json
 
 # Expo
 .expo/

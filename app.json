@@ -28,6 +28,15 @@
     "plugins": [
       "expo-build-properties",
       [
+        "./plugins/withAndroidGradleProperties.js",
+        [
+          {
+          "configKey": "AsyncStorage_db_size_in_MB",
+          "configValue": 30
+          }
+        ]
+      ],
+      [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow ${PRODUCT_NAME} to access your location"
