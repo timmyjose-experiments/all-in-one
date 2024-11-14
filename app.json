@@ -32,7 +32,7 @@
         [
           {
           "configKey": "AsyncStorage_db_size_in_MB",
-          "configValue": 30
+          "configValue": 50
           }
         ]
       ],

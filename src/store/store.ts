@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import eventsReducer from '../features/events/eventSlice'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { persistReducer, persistStore}  from 'redux-persist'
+import ChunkedAsyncStorage from '../features/events/ChunkedAsyncStorage'
 
 const persistConfig = {
   key: 'events.key',
-  storage: AsyncStorage
+  storage: ChunkedAsyncStorage
 }
 
 const persistedReducer = persistReducer(persistConfig, eventsReducer)

@@ -3,11 +3,11 @@ import { Event } from './types'
 import { AppState } from '../../store/store'
 
 export interface EventState {
-  events: Event[] | null
+  events: Event[]
 }
 
 const initialState: EventState = {
-  events: null
+  events: []
 }
 
 export const eventsSlice = createSlice({
@@ -15,12 +15,16 @@ export const eventsSlice = createSlice({
   initialState,
   reducers: {
     addEvent: (state, action: PayloadAction<Event>) => {
-      state.events?.push(action.payload)
+      state.events.push(action.payload)
+    },
+    clearEvents: (state) => {
+      state.events = []
     }
   }
 })
 
-export const getEvent = (state: AppState, id: number) => state.events?.filter((evt: Event) => evt.id === id)
+export const getEvent = () => (state: AppState, id: string) => state.events?.filter((evt: Event) => evt.id === id)
+export const getEvents = () => (state: AppState) => state.events
 
-export const { addEvent } = eventsSlice.actions
+export const { addEvent, clearEvents } = eventsSlice.actions
 export default eventsSlice.reducer
