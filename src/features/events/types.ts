@@ -374,3 +374,7 @@ export type IssuesEvent = {
 }
 
 export type Event = CreateEvent | PushEvent | WatchEvent | ReleaseEvent | PullRequestEvent | IssuesEvent | DeleteEvent
+
+export type RootEvent = {
+  events: Event[]
+}
