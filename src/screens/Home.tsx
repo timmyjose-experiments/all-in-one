@@ -3,9 +3,16 @@ import styles from '../styles'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../App'
+import { usePostHog } from 'posthog-react-native'
+import { useEffect } from 'react'
 
 const Home = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const posthog = usePostHog()
+
+  useEffect(() => {
+    posthog.capture('home')
+  }, [posthog])
 
   return (
     <View style={styles.container}>

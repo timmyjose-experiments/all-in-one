@@ -16,15 +16,15 @@ const Stack = createNativeStackNavigator<RootStackParamList>()
 
 const App = () => {
   return (
-    <PostHogProvider client={posthog}>
-      <NavigationContainer>
+    <NavigationContainer>
+      <PostHogProvider client={posthog}>
         <Stack.Navigator>
           <Stack.Screen name='Home' component={Home} />
           <Stack.Screen name='NetworkInfoDemo' component={NetworkInfoDemo} />
           <Stack.Screen name='LocationDemo' component={LocationDemo} />
         </Stack.Navigator>
-      </NavigationContainer>
-    </PostHogProvider>
+      </PostHogProvider>
+    </NavigationContainer>
   )
 }
 
