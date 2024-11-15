@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const CHUNK_SIZE = 1024
+const CHUNK_SIZE = 1024 * 1024 // 1 MB
 
 const ChunkedAsyncStorage = {
   async setItem(key: string, value: any) {
@@ -13,9 +13,12 @@ const ChunkedAsyncStorage = {
     }
     console.log(`[ChunkedAyncStorage] chunks = ${chunks}, len = ${chunks.length}`)
 
-    await Promise.all(
-      chunks.map((chunk, idx) => AsyncStorage.setItem(`${key}_chunk_${idx}`, chunk))
-    )
+    const chunkKeyValuePairs: Array<[string, string]> = 
+      chunks.map((chunk, idx) => 
+        [`${key}_chunk_${idx}`, chunk]
+      )
+
+    await AsyncStorage.multiSet(chunkKeyValuePairs)
     await AsyncStorage.setItem(`${key}_chunk_count`, chunks.length.toString())
   },
 
@@ -32,12 +35,9 @@ const ChunkedAsyncStorage = {
       return null
     }
 
-   const chunks = await Promise.all(
-      Array.from({ length: numChunks }, (_, idx) =>
-        AsyncStorage.getItem(`${key}_chunk_${idx}`)
-      )
-    )
-
+    const chunksKeys = 
+      Array.from({ length: numChunks }, (_, idx) => `${key}_chunk_${idx}`)
+    const chunks = await AsyncStorage.multiGet(chunksKeys)
     return chunks.join('')
   },
 
@@ -50,14 +50,11 @@ const ChunkedAsyncStorage = {
 
     const numChunks = parseInt(numChunksStr)
     if (!isNaN(numChunks)) {
-     await Promise.all(
-        Array.from({ length: numChunks }, (_, idx) =>
-          AsyncStorage.removeItem(`${key}_chunk_${idx}`)
-        )
-      )
-
-      await AsyncStorage.removeItem(`${key}_chunk_count`)
+      const chunksKeys = 
+        Array.from({ length: numChunks }, (_, idx) => `${key}_chunk_${idx}`)
+      await AsyncStorage.multiRemove(chunksKeys)
     }
+    await AsyncStorage.removeItem(`${key}_chunk_count`)
   }
 }
 
