@@ -23,8 +23,8 @@ export const eventsSlice = createSlice({
   }
 })
 
-export const getEvent = () => (state: AppState, id: string) => state.events?.filter((evt: Event) => evt.id === id)
-export const getEvents = () => (state: AppState) => state.events
+export const getEvent = () => (state: AppState, id: string) => state.events.events?.filter((evt: Event) => evt.id === id)
+export const getEvents = () => (state: AppState) => state.events.events
 
 export const { addEvent, clearEvents } = eventsSlice.actions
 export default eventsSlice.reducer
