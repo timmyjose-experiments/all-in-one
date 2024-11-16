@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Event } from './types'
 import { AppState } from '../../store/store'
 
 export interface EventState {
-  events: Event[]
+  events: any[]
 }
 
 const initialState: EventState = {
@@ -14,7 +13,7 @@ export const eventsSlice = createSlice({
   name: 'events',
   initialState,
   reducers: {
-    addEvent: (state, action: PayloadAction<Event>) => {
+    addEvent: (state, action: PayloadAction<any>) => {
       state.events.push(action.payload)
     },
     clearEvents: (state) => {

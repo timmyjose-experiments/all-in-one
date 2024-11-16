@@ -1,16 +1,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import eventsReducer from '../features/events/eventSlice'
 import nonJsonReducer from '../features/nonjson/nonjsonSlice'
-import { PAUSE, PERSIST, persistReducer, persistStore, PURGE, REGISTER, REHYDRATE}  from 'redux-persist'
+import { PERSIST, persistReducer, persistStore, REHYDRATE}  from 'redux-persist'
 import ChunkedAsyncStorage from '../features/events/ChunkedAsyncStorage'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import DummyAsyncStorage from '../features/events/DummyAsyncStorage'
 
 const persistConfig = {
   key: 'main.app.key',
-  // storage: DummyAsyncStorage
   storage: ChunkedAsyncStorage
-  // storage: AsyncStorage
 }
 
 const combinedReducers = combineReducers({
@@ -26,7 +22,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware({
       serializableCheck: {
-        ignoredActions: [PERSIST, REHYDRATE, PURGE, PAUSE, REGISTER]
+        ignoredActions: [PERSIST, REHYDRATE]
       }
     })
 })

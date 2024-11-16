@@ -5,14 +5,13 @@ import { ActivityIndicator, FlatList, Pressable, Text, View } from 'react-native
 import styles from '../styles'
 import { useCallback, useEffect, useState } from 'react'
 // Test file: https://github.com/json-iterator/test-data/blob/master/large-file.json
-import allEvents from '../../large-entries.json'
+import allEvents from '../../small-file.json'
 import { Event } from '../features/events/types'
 import { useDispatch, useSelector } from 'react-redux'
 import { addEvent, getEvents, clearEvents } from '../features/events/eventSlice'
 import { addStringToArray, doubleFloat, getArraySelector, getBoolSelector, getFloatSelector, getIntSelector, getStringSelector, incrementInt } from '../features/nonjson/nonjsonSlice'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import ChunkedAsyncStorage from '../features/events/ChunkedAsyncStorage'
 import { persistor } from '../store/store'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const AsyncStorageMultiSetGetDemo = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -34,7 +33,7 @@ const AsyncStorageMultiSetGetDemo = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const eventsJson: Event[] = allEvents.events
+        const eventsJson: any[] = allEvents.events
         setEvents(eventsJson)
       } catch (err: any) {
         console.error(err)
@@ -44,21 +43,22 @@ const AsyncStorageMultiSetGetDemo = () => {
     fetchEvents()
   }, [])
 
-  // useEffect(() => {
-  //   (async () => {
-  //     const allKeys = await AsyncStorage.getAllKeys()
-  //     console.log(`Listing all keys....${allKeys}`)
-  //     for (const key in allKeys) {
-  //       const val = await AsyncStorage.getItem(key)
-  //       console.log(`value = ${val}`)
-  //     }
-  //   })()
-  // }, [])
+  useEffect(() => {
+    (async () => {
+      const allKeys = await AsyncStorage.getAllKeys()
+      console.log(`Listing all keys....${allKeys}, number of keys = ${allKeys.length}`)
+      // for (const key in allKeys) {
+      //   const val = await AsyncStorage.getItem(key)
+      //   console.log(`value = ${val}`)
+      // }
+    })()
+  }, [])
 
-  const showReduxStore = useCallback(async () => {
-    console.log('Showing Redux Store contents...')
+  const showEvents = useCallback(async () => {
     setLoading(true)
 
+    const numEvents = retrievedEvents.length
+    console.log(`Number of events = ${numEvents}`)
     retrievedEvents.forEach((evt) => console.log(JSON.stringify(evt, null, 2)))
 
     setLoading(false)
@@ -85,7 +85,7 @@ const AsyncStorageMultiSetGetDemo = () => {
 
     try {
       dispatch(clearEvents())
-      await persistor.purge()
+      // await persistor.purge()
     } catch (err: any) {
       console.error(`Error while purging events: ${err}`)
     } finally {
@@ -121,8 +121,8 @@ const AsyncStorageMultiSetGetDemo = () => {
       </Pressable>
       <Pressable
         style={styles.button}
-        onPress={showReduxStore}>
-        <Text>Show Redux Store</Text>
+        onPress={showEvents}>
+        <Text>Show Events</Text>
       </Pressable>
       <Pressable
         style={styles.button}
