@@ -12,6 +12,7 @@ import { addEvent, getEvents, clearEvents } from '../features/events/eventSlice'
 import { addStringToArray, doubleFloat, getArraySelector, getBoolSelector, getFloatSelector, getIntSelector, getStringSelector, incrementInt } from '../features/nonjson/nonjsonSlice'
 import { persistor } from '../store/store'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { posthog } from '../config/posthog'
 
 const AsyncStorageMultiSetGetDemo = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -29,6 +30,10 @@ const AsyncStorageMultiSetGetDemo = () => {
   const str = useSelector(getStringSelector)
   const b = useSelector(getBoolSelector)
   const arr = useSelector(getArraySelector)
+
+  useEffect(() => {
+    posthog.capture('AsyncStorageMultiGetSetDemo')
+  }, [posthog])
 
   useEffect(() => {
     const fetchEvents = async () => {
