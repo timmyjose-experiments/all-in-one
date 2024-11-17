@@ -7,6 +7,8 @@ import AsyncStorageMultiSetGetDemo from './screens/AsyncStorageMultiSetGetDemo'
 import { Provider } from 'react-redux'
 import { persistor, store } from './store/store'
 import { PersistGate } from 'redux-persist/integration/react'
+import { posthog } from './config/posthog'
+import { PostHogProvider } from 'posthog-react-native'
 
 export type RootStackParamList = {
   Home: undefined
@@ -22,12 +24,14 @@ const App = () => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen name='Home' component={Home} />
-            <Stack.Screen name='NetworkInfoDemo' component={NetworkInfoDemo} />
-            <Stack.Screen name='LocationDemo' component={LocationDemo} />
-            <Stack.Screen name='AsyncStorageMultiSetGetDemo' component={AsyncStorageMultiSetGetDemo} />
-          </Stack.Navigator>
+          <PostHogProvider client={posthog}>
+            <Stack.Navigator>
+              <Stack.Screen name='Home' component={Home} />
+              <Stack.Screen name='NetworkInfoDemo' component={NetworkInfoDemo} />
+              <Stack.Screen name='LocationDemo' component={LocationDemo} />
+              <Stack.Screen name='AsyncStorageMultiSetGetDemo' component={AsyncStorageMultiSetGetDemo} />
+            </Stack.Navigator>
+          </PostHogProvider>
         </NavigationContainer>
       </PersistGate>
     </Provider>

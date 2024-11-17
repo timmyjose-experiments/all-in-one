@@ -5,9 +5,11 @@ import { Pressable, View, Text } from 'react-native'
 import styles from '../styles'
 import { useEffect, useState } from 'react'
 import * as Location from 'expo-location'
+import { usePostHog } from 'posthog-react-native'
 
 const LocationDemo = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const posthog = usePostHog()
 
   const [location, setLocation] = useState<Location.LocationObject | null>(null)
   const [errorMsg, setErrorMsg] = useState<string | null>(null)
@@ -21,6 +23,7 @@ const LocationDemo = () => {
       }
 
       let location = await Location.getCurrentPositionAsync()
+      posthog.capture('location-demo')
       setLocation(location)
     })()
   }, [])

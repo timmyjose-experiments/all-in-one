@@ -4,11 +4,20 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { RootStackParamList } from '../App'
 import usePublicIp from '../features/usePublicIp'
+import { usePostHog } from 'posthog-react-native'
+import { useEffect } from 'react'
 
 const NetworkInfoDemo = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const posthog = usePostHog()
 
   const { ipifyIpAddress, ipifyError, ipdataIpAddress, ipdataError } = usePublicIp()
+
+  useEffect(() => {
+    posthog.capture('network-info-demo', {
+      ipAddress: ipifyIpAddress
+    })
+  }, [posthog, ipifyIpAddress])
 
   return (
     <View style={styles.container}>
