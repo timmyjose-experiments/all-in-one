@@ -9,6 +9,7 @@ import { persistor, store } from './store/store'
 import { PersistGate } from 'redux-persist/integration/react'
 import { posthog } from './config/posthog'
 import { PostHogProvider } from 'posthog-react-native'
+import { useEffect } from 'react'
 
 export type RootStackParamList = {
   Home: undefined
@@ -20,6 +21,13 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
 const App = () => {
+  useEffect(() => {
+    posthog.register({
+      country_code: 'in',
+      country_name: 'India'
+    })
+  }, [])
+
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
